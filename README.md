@@ -1,2 +1,2 @@
 # MirageEnchants
-Заранее созданный repository
+Заранее созданный repository, ожидайте обновлений.

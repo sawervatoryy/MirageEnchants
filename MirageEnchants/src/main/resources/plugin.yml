@@ -1,0 +1,6 @@
+name: MirageEnchants
+version: '${version}'
+
+main: org.github.sawervatoryy.mirageEnchants.MirageEnchants
+api-version: '1.21.4'
+load: POSTWORLD

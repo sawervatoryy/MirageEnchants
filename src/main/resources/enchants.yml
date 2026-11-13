@@ -1,0 +1,340 @@
+# ======================================================================
+#  MirageEnchants  |  MirageStudio  -  Автор: sawervatoryy
+#  Discord: https://discord.gg/mQbZT3x3Q
+# ======================================================================
+# Общие параметры каждого зачарования:
+#   enabled        - включить/выключить зачарование (эффект, книга, стол, наковальня)
+#   display-name   - название (цвета &a и HEX &#RRGGBB)
+#   description    - описание (показывается в книге)
+#   max-level      - максимальный уровень
+#   applies-to     - на что накладывается: PICKAXE, AXE, SHOVEL, HOE, SWORD, TRIDENT, BOW,
+#                    CROSSBOW, MACE, HELMET, CHESTPLATE, LEGGINGS, BOOTS, ELYTRA,
+#                    ARMOR, TOOLS, WEAPONS, ALL или имя материала (DIAMOND_SWORD)
+#   conflicts-with - список несовместимых кастомных чаров
+#   book.enabled   - можно ли выдать как книгу
+#   table          - стол зачарований: enabled, chance (%), max-level, min-cost (мин. уровень стола)
+#   anvil          - enabled, max-level (до какого уровня объединять на наковальне)
+#   settings       - свои параметры. Число ИЛИ таблица "уровень: значение"
+#                    (если уровня нет в таблице, берётся ближайший меньший)
+enchants:
+
+  # ------------------------------------------------------------ БРОНЯ
+  impenetrable:
+    enabled: true
+    display-name: "&#FF7A7AНепробиваемый"
+    description:
+      - "&7Шанс получить на &f50% &7меньше урона."
+      - "&7Шансы с разных частей брони складываются."
+    max-level: 2
+    applies-to: [HELMET, CHESTPLATE, LEGGINGS, BOOTS]
+    conflicts-with: []
+    book: {enabled: true}
+    table: {enabled: true, chance: 6.0, max-level: 1, min-cost: 15}
+    anvil: {enabled: true, max-level: 2}
+    settings:
+      chance: {1: 2, 2: 4}          # шанс % с одной части брони
+      reduction-percent: 50         # на сколько % режется урон
+
+  lava_walker:
+    enabled: true
+    display-name: "&#FF9A3CЛаваход"
+    description:
+      - "&7Превращает лаву под ногами в обсидиан."
+      - "&7Тратит прочность ботинок."
+    max-level: 2
+    applies-to: [BOOTS]
+    conflicts-with: []
+    book: {enabled: true}
+    table: {enabled: true, chance: 5.0, max-level: 1, min-cost: 15}
+    anvil: {enabled: true, max-level: 2}
+    settings:
+      size: {1: 3, 2: 5}            # область (3x3 / 5x5)
+      durability-cost: 1            # прочность за каждое срабатывание
+      result-block: OBSIDIAN
+      only-sources: true            # превращать только источники лавы
+      revert-seconds: 0             # через сколько секунд вернуть лаву (0 - навсегда)
+
+  # ------------------------------------------------------- ИНСТРУМЕНТЫ
+  magnetism:
+    enabled: true
+    display-name: "&#6BC5FFМагнетизм"
+    description:
+      - "&7Добытые ресурсы сразу попадают в инвентарь."
+    max-level: 1
+    applies-to: [TOOLS]
+    conflicts-with: []
+    book: {enabled: true}
+    table: {enabled: true, chance: 8.0, max-level: 1, min-cost: 10}
+    anvil: {enabled: true, max-level: 1}
+    settings:
+      drop-leftover: true           # если инвентарь полон - выбросить остаток
+
+  drill:
+    enabled: true
+    display-name: "&#FFD27FБур"
+    description:
+      - "&7Ломает блоки областью 3x3."
+      - "&7Присед - ломает один блок."
+    max-level: 2
+    applies-to: [PICKAXE]
+    conflicts-with: [mega_drill]
+    book: {enabled: true}
+    table: {enabled: true, chance: 6.0, max-level: 1, min-cost: 20}
+    anvil: {enabled: true, max-level: 2}
+    settings:
+      size: 3
+      depth: {1: 1, 2: 2}           # 1 ур. - 3x3x1, 2 ур. - 3x3x2
+
+  mega_drill:
+    enabled: true
+    display-name: "&#FF6BD6Мега-бур"
+    description:
+      - "&7Ломает блоки областью 5x5x2."
+    max-level: 1
+    applies-to: [PICKAXE]
+    conflicts-with: [drill]
+    book: {enabled: true}
+    table: {enabled: false, chance: 1.0, max-level: 1, min-cost: 30}
+    anvil: {enabled: true, max-level: 1}
+    settings:
+      size: 5
+      depth: 2
+
+  autosmelt:
+    enabled: true
+    display-name: "&#FF8A5CАвтоплавка"
+    description:
+      - "&7Руда сразу выпадает в виде слитков."
+    max-level: 1
+    applies-to: [PICKAXE]
+    conflicts-with: []
+    book: {enabled: true}
+    table: {enabled: true, chance: 6.0, max-level: 1, min-cost: 15}
+    anvil: {enabled: true, max-level: 1}
+    settings:
+      ores-auto: true               # плавить RAW_*, *_ORE, ANCIENT_DEBRIS
+      whitelist: []                 # дополнительные материалы для плавки
+
+  experienced:
+    enabled: true
+    display-name: "&#9DFF6BОпытный"
+    description:
+      - "&7Больше опыта за добычу блоков."
+    max-level: 3
+    applies-to: [TOOLS]
+    conflicts-with: []
+    book: {enabled: true}
+    table: {enabled: true, chance: 8.0, max-level: 2, min-cost: 10}
+    anvil: {enabled: true, max-level: 3}
+    settings:
+      bonus-percent: {1: 10, 2: 20, 3: 30}
+
+  indestructible:
+    enabled: true
+    display-name: "&#B0B0FFНеразрушимость"
+    description:
+      - "&7Инструмент нельзя использовать,"
+      - "&7если его прочность меньше 10."
+    max-level: 1
+    applies-to: [TOOLS]
+    conflicts-with: []
+    book: {enabled: true}
+    table: {enabled: true, chance: 4.0, max-level: 1, min-cost: 15}
+    anvil: {enabled: true, max-level: 1}
+    settings:
+      min-durability: 10
+
+  lumberjack:
+    enabled: true
+    display-name: "&#8FD16BДровосек"
+    description:
+      - "&7Срубает дерево целиком."
+    max-level: 3
+    applies-to: [AXE]
+    conflicts-with: []
+    book: {enabled: true}
+    table: {enabled: true, chance: 6.0, max-level: 2, min-cost: 15}
+    anvil: {enabled: true, max-level: 3}
+    settings:
+      max-blocks: {1: 8, 2: 32, 3: 128}
+      require-leaves: false         # рубить только деревья (с листвой рядом)
+
+  delicate:
+    enabled: true
+    display-name: "&#FFC6E0Деликатный"
+    description:
+      - "&7Не ломает несозревшие культуры."
+    max-level: 3
+    applies-to: [HOE]
+    conflicts-with: []
+    book: {enabled: true}
+    table: {enabled: true, chance: 8.0, max-level: 1, min-cost: 5}
+    anvil: {enabled: true, max-level: 3}
+    settings:
+      crops: [WHEAT, CARROTS, POTATOES, BEETROOTS, NETHER_WART, TORCHFLOWER_CROP, PITCHER_CROP]
+
+  farmer:
+    enabled: true
+    display-name: "&#E8C547Фермер"
+    description:
+      - "&7Кратно увеличивает дроп культур."
+    max-level: 5
+    applies-to: [HOE, AXE]
+    conflicts-with: []
+    book: {enabled: true}
+    table: {enabled: true, chance: 7.0, max-level: 2, min-cost: 10}
+    anvil: {enabled: true, max-level: 5}
+    settings:
+      multiplier: {1: 2, 2: 3, 3: 4, 4: 5, 5: 6}
+      crops: [WHEAT, CARROTS, POTATOES, BEETROOTS, NETHER_WART, COCOA, SWEET_BERRY_BUSH, PUMPKIN, MELON, SUGAR_CANE, BAMBOO, CACTUS]
+      age-checked: [WHEAT, CARROTS, POTATOES, BEETROOTS, NETHER_WART, COCOA, SWEET_BERRY_BUSH]
+      exclude: [WHEAT_SEEDS, BEETROOT_SEEDS, MELON_SEEDS, PUMPKIN_SEEDS]   # не умножать
+
+  seeding:
+    enabled: true
+    display-name: "&#7DE07DПосев"
+    description:
+      - "&7Шанс повторно посадить росток"
+      - "&7при сборе урожая."
+    max-level: 2
+    applies-to: [HOE]
+    conflicts-with: []
+    book: {enabled: true}
+    table: {enabled: true, chance: 8.0, max-level: 1, min-cost: 5}
+    anvil: {enabled: true, max-level: 2}
+    settings:
+      chance: {1: 50, 2: 100}
+      crops: [WHEAT, CARROTS, POTATOES, BEETROOTS, NETHER_WART]
+
+  filter:
+    enabled: true
+    display-name: "&#A0A0A0Фильтр"
+    description:
+      - "&7Убирает выпадение выбранных предметов."
+      - "&7Настройка: &f/setfilter"
+    max-level: 1
+    applies-to: [TOOLS]
+    conflicts-with: []
+    book: {enabled: true}
+    table: {enabled: true, chance: 5.0, max-level: 1, min-cost: 10}
+    anvil: {enabled: true, max-level: 1}
+    settings: {}
+
+  # ------------------------------------------------------------ ОРУЖИЕ
+  crusher:
+    enabled: true
+    display-name: "&#FF4D4DКрушитель"
+    description:
+      - "&7Увеличивает урон по игрокам."
+    max-level: 7
+    applies-to: [SWORD, AXE, TRIDENT]
+    conflicts-with: []
+    book: {enabled: true}
+    table: {enabled: true, chance: 5.0, max-level: 3, min-cost: 20}
+    anvil: {enabled: true, max-level: 7}
+    settings:
+      damage-bonus-percent: {1: 5, 2: 10, 3: 15, 4: 20, 5: 25, 6: 30, 7: 35}
+
+  breaker:
+    enabled: true
+    display-name: "&#C97BFFРазрушитель"
+    description:
+      - "&7Броня противника изнашивается быстрее."
+    max-level: 2
+    applies-to: [SWORD, AXE]
+    conflicts-with: []
+    book: {enabled: true}
+    table: {enabled: true, chance: 5.0, max-level: 1, min-cost: 20}
+    anvil: {enabled: true, max-level: 2}
+    settings:
+      extra-wear-percent: {1: 12.5, 2: 25}
+
+  critical:
+    enabled: true
+    display-name: "&#FFB347Критический"
+    description:
+      - "&7Шанс нанести повышенный урон."
+    max-level: 2
+    applies-to: [SWORD, AXE]
+    conflicts-with: []
+    book: {enabled: true}
+    table: {enabled: true, chance: 6.0, max-level: 1, min-cost: 15}
+    anvil: {enabled: true, max-level: 2}
+    settings:
+      chance: {1: 10, 2: 20}
+      damage-bonus-percent: 15
+
+  rich:
+    enabled: true
+    display-name: "&#FFD700Богач"
+    description:
+      - "&7Больше монет за убийство мобов."
+    max-level: 5
+    applies-to: [SWORD]
+    conflicts-with: []
+    book: {enabled: true}
+    table: {enabled: true, chance: 5.0, max-level: 2, min-cost: 15}
+    anvil: {enabled: true, max-level: 5}
+    settings:
+      bonus-percent: {1: 40, 2: 80, 3: 120, 4: 160, 5: 200}   # +% к награде за моба
+      bonus-only: true              # true - платить только бонус, false - базу + бонус
+      include-players: false
+      mob-rewards:                  # базовая награда за моба (для расчёта бонуса)
+        default: 1.0
+        ZOMBIE: 2.0
+        SKELETON: 2.0
+        CREEPER: 3.0
+        ENDERMAN: 5.0
+        WITHER_SKELETON: 6.0
+
+  xp_farmer:
+    enabled: true
+    display-name: "&#7DFFB0Фармер"
+    description:
+      - "&7Множитель опыта за убийство мобов."
+    max-level: 13
+    applies-to: [SWORD]
+    conflicts-with: []
+    book: {enabled: true}
+    table: {enabled: false, chance: 1.0, max-level: 1, min-cost: 30}
+    anvil: {enabled: true, max-level: 13}
+    settings:
+      mode: LINEAR                  # LINEAR: 1 ур. x2, 2 ур. x4, 3 ур. x6 ...  |  EXPONENTIAL: x2, x4, x8 ...
+      multiplier-per-level: 2
+
+  # ----------------------------------------------------------- ТРЕЗУБЕЦ
+  homing:
+    enabled: true
+    display-name: "&#4DD2FFСамонаводка"
+    description:
+      - "&7Наводит трезубец на ближайшего игрока."
+      - "&7Чем дальше цель - тем меньше урон."
+    max-level: 4
+    applies-to: [TRIDENT]
+    conflicts-with: []
+    book: {enabled: true}
+    table: {enabled: true, chance: 5.0, max-level: 2, min-cost: 20}
+    anvil: {enabled: true, max-level: 4}
+    settings:
+      radius: {1: 8, 2: 12, 3: 16, 4: 20}
+      max-angle-degrees: 60
+      tracking-ticks: 30            # 0 - только один раз навести при броске
+      max-damage-reduction-percent: 50
+
+  # --------------------------------------------------------- ЛУК/АРБАЛЕТ
+  stun:
+    enabled: true
+    display-name: "&#B3E5FCОглушение"
+    description:
+      - "&7Шанс замедлить и ослепить игрока."
+    max-level: 2
+    applies-to: [BOW, CROSSBOW]
+    conflicts-with: []
+    book: {enabled: true}
+    table: {enabled: true, chance: 6.0, max-level: 1, min-cost: 15}
+    anvil: {enabled: true, max-level: 2}
+    settings:
+      chance: {1: 3, 2: 5}
+      slowness-amplifier: 3         # замедление 4 уровня
+      slowness-seconds: 3
+      blindness-seconds: 2

@@ -1,0 +1,36 @@
+name: MirageEnchants
+version: '${version}'
+main: org.github.sawervatoryy.mirageEnchants.MirageEnchants
+api-version: '1.21'
+load: POSTWORLD
+authors: [sawervatoryy]
+website: https://discord.gg/mQbZT3x3Q
+description: "MirageStudio - кастомные зачарования (HolyWorld-style) + редактор ванильных зачарований"
+softdepend: [Vault, Essentials]
+
+commands:
+  mirage:
+    description: Главная команда MirageEnchants (MirageStudio)
+    aliases: [mench, mirageenchants]
+    usage: /mirage help
+  enchedit:
+    description: Редактор ванильных и кастомных зачарований
+    aliases: [enchanteditor]
+    usage: /enchedit
+  setfilter:
+    description: Настройка фильтра предметов (зачарование «Фильтр»)
+    usage: /setfilter
+
+permissions:
+  mirageenchants.admin:
+    description: Админ-команды /mirage
+    default: op
+  mirageenchants.editor:
+    description: Доступ к редактору зачарований
+    default: op
+  mirageenchants.filter:
+    description: Доступ к /setfilter
+    default: true
+  mirageenchants.grindstone:
+    description: Доступ к кастомному точилу
+    default: true

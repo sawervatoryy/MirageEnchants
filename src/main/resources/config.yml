@@ -1,0 +1,93 @@
+# ======================================================================
+#  MirageEnchants  |  MirageStudio  -  Автор: sawervatoryy
+#  Discord: https://discord.gg/mQbZT3x3Q
+#  Paper 1.21.4. Настройки каждого зачарования - в enchants.yml
+#  Тексты - в messages.yml. Цвета: &a, &l ... и HEX вида &#RRGGBB
+# ======================================================================
+
+# Вид строк зачарований в лоре предмета
+lore:
+  format: "{name} {level}"        # {name} - название, {level} - уровень
+  roman: true                      # римские цифры
+  hide-level-if-max-1: true        # не показывать уровень, если максимум 1
+
+# Книги зачарований
+book:
+  display-name: "&#FFD27FКнига зачарования &8» &f{name} {level}"
+
+# Наковальня
+anvil:
+  enabled: true
+  allow-item-to-item: true         # объединять предмет с предметом (кастомные чары)
+  extended-vanilla-levels: true    # разрешить ванильным чарам превышать вынужденный максимум (см. vanilla.anvil-max-levels)
+  custom-cost-per-level: 2         # цена (в уровнях опыта) за каждый уровень кастомного чара
+  extended-cost-per-level: 2       # то же для расширенных ванильных
+  max-repair-cost: 1000            # убрать надпись "Слишком дорого"
+
+# Стол зачарований: кастомные чары выпадают как обычные
+# (шанс, макс. уровень и мин. уровень стола задаются у каждого чара: table.* в enchants.yml)
+table:
+  custom-enchants:
+    enabled: true
+    max-per-item: 1                # сколько кастомных чаров максимум за одно зачарование
+    chance-multiplier: 1.0         # общий множитель шансов
+    allow-on-books: true           # на столе можно получить кастомные чары на книге
+
+# Бур / Мега-бур / Дровосек
+multi-break:
+  only-survival: true
+  disable-when-sneaking: true      # на приседе ломается только один блок
+  only-preferred-tool: true        # ломать только блоки, подходящие инструменту
+  blacklist:
+    - BEDROCK
+    - BARRIER
+    - SPAWNER
+    - END_PORTAL_FRAME
+    - REINFORCED_DEEPSLATE
+    - COMMAND_BLOCK
+    - CHAIN_COMMAND_BLOCK
+    - REPEATING_COMMAND_BLOCK
+    - STRUCTURE_BLOCK
+    - JIGSAW
+
+# Особенности «Прочности» и «Починки» (вики HolyWorld)
+durability:
+  armor-unbreaking:
+    enabled: true                  # шанс не потратить прочность брони/элитр
+    base-chance: 47                # шанс % = base-chance + уровень * per-level
+    per-level: 10
+    max-chance: 100
+  block-mending-on-armor: true     # Починку нельзя наложить на броню (+ не работает опытом)
+  block-anvil-repair-armor: true   # броню нельзя чинить в наковальне
+  block-fix-command-armor: true    # /fix не чинит броню (откат износа после команды)
+  fix-commands: [fix, repair, efix, erepair]
+
+# Точило (заменяет ванильное при ПКМ; присед + ПКМ - ванильное)
+grindstone:
+  replace-vanilla: true
+  give-xp: true
+  xp-per-enchant-level: 3          # опыта за каждый снятый уровень чара
+
+# Редактор /enchedit
+editor:
+  max-level: 255                   # максимум для ванильных (не больше 255)
+  custom-above-max: false          # разрешить кастомным чарам выходить за их max-level
+  vanilla-max: {}                  # индивидуально, например:  sharpness: 100
+
+# Ванильные чары: максимальные уровни на наковальне (вики HolyWorld)
+vanilla:
+  anvil-max-levels:
+    efficiency: 10
+    sharpness: 7
+    protection: 5
+    smite: 7
+    bane_of_arthropods: 7
+    unbreaking: 5
+    looting: 5
+    fortune: 5
+    mending: 2
+
+# Экономика для «Богача»: Vault (Essentials и любые плагины валюты с Vault) или команда
+economy:
+  mode: VAULT                      # VAULT | COMMAND
+  give-command: "eco give {player} {amount}"

@@ -6,7 +6,7 @@
 
     <groupId>org.github.sawervatoryy</groupId>
     <artifactId>mirageenchants</artifactId>
-    <version>v0.1</version>
+    <version>1.1.0</version>
     <packaging>jar</packaging>
 
     <name>mirageenchants</name>

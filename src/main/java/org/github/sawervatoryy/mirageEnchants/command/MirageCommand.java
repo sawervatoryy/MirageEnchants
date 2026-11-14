@@ -10,6 +10,7 @@ import org.bukkit.inventory.ItemStack;
 import org.github.sawervatoryy.mirageEnchants.MirageEnchants;
 import org.github.sawervatoryy.mirageEnchants.enchant.CustomEnchant;
 import org.github.sawervatoryy.mirageEnchants.gui.EditorGui;
+import org.github.sawervatoryy.mirageEnchants.items.SavedItems;
 import org.github.sawervatoryy.mirageEnchants.util.Watermark;
 
 import java.util.ArrayList;
@@ -57,6 +58,7 @@ public final class MirageCommand implements CommandExecutor, TabCompleter {
                             "status", plugin.messages().raw(ce.enabled() ? "status-on" : "status-off"));
                 }
             }
+            case "item" -> item(sender, args);
             case "book" -> book(sender, args);
             case "add" -> add(sender, args);
             case "remove" -> remove(sender, args);
@@ -75,6 +77,72 @@ public final class MirageCommand implements CommandExecutor, TabCompleter {
         try { return Integer.parseInt(s); } catch (NumberFormatException e) { return def; }
     }
 
+
+    // ------------------------------------------------------------------ сохранённые предметы
+
+    private void item(CommandSender sender, String[] args) {
+        if (args.length < 2) { plugin.messages().sendList(sender, "item-help"); return; }
+        SavedItems store = plugin.savedItems();
+        switch (args[1].toLowerCase(Locale.ROOT)) {
+            case "save" -> {
+                if (!(sender instanceof Player p)) { plugin.messages().send(sender, "player-only"); return; }
+                if (args.length < 3) { plugin.messages().send(sender, "item-usage-save"); return; }
+                if (!SavedItems.validName(args[2])) { plugin.messages().send(sender, "item-name-invalid"); return; }
+                ItemStack hand = p.getInventory().getItemInMainHand();
+                if (hand.getType().isAir()) { plugin.messages().send(p, "hold-item"); return; }
+                boolean existed = store.has(args[2]);
+                if (!store.save(args[2], hand)) { plugin.messages().send(p, "item-save-failed"); return; }
+                plugin.messages().send(p, existed ? "item-updated" : "item-saved", "name", args[2].toLowerCase(Locale.ROOT));
+            }
+            case "give" -> {
+                if (args.length < 4) { plugin.messages().send(sender, "item-usage-give"); return; }
+                Player target = Bukkit.getPlayerExact(args[2]);
+                if (target == null) { plugin.messages().send(sender, "player-not-found"); return; }
+                ItemStack base = store.get(args[3]);
+                if (base == null) { plugin.messages().send(sender, "item-not-found", "name", args[3]); return; }
+                int amount = Math.max(1, Math.min(2304, args.length > 4 ? parseLevel(args[4], 1) : 1));
+                giveItem(target, base, amount);
+                plugin.messages().send(sender, "item-given", "player", target.getName(), "name", args[3].toLowerCase(Locale.ROOT), "amount", String.valueOf(amount));
+                plugin.messages().send(target, "item-received", "name", args[3].toLowerCase(Locale.ROOT), "amount", String.valueOf(amount));
+            }
+            case "get" -> {
+                if (!(sender instanceof Player p)) { plugin.messages().send(sender, "player-only"); return; }
+                if (args.length < 3) { plugin.messages().send(sender, "item-usage-get"); return; }
+                ItemStack base = store.get(args[2]);
+                if (base == null) { plugin.messages().send(sender, "item-not-found", "name", args[2]); return; }
+                int amount = Math.max(1, Math.min(2304, args.length > 3 ? parseLevel(args[3], 1) : 1));
+                giveItem(p, base, amount);
+                plugin.messages().send(p, "item-received", "name", args[2].toLowerCase(Locale.ROOT), "amount", String.valueOf(amount));
+            }
+            case "list" -> {
+                List<String> names = store.names();
+                if (names.isEmpty()) { plugin.messages().send(sender, "item-list-empty"); return; }
+                plugin.messages().sendList(sender, "item-list-header");
+                for (String n : names) {
+                    plugin.messages().send(sender, "item-list-line", "name", n, "material", store.get(n).getType().name());
+                }
+            }
+            case "delete" -> {
+                if (args.length < 3) { plugin.messages().send(sender, "item-usage-delete"); return; }
+                if (store.delete(args[2])) plugin.messages().send(sender, "item-deleted", "name", args[2].toLowerCase(Locale.ROOT));
+                else plugin.messages().send(sender, "item-not-found", "name", args[2]);
+            }
+            default -> plugin.messages().sendList(sender, "item-help");
+        }
+    }
+
+    private void giveItem(Player target, ItemStack base, int amount) {
+        int max = Math.max(1, base.getMaxStackSize());
+        int left = amount;
+        while (left > 0) {
+            ItemStack part = base.clone();
+            part.setAmount(Math.min(max, left));
+            left -= part.getAmount();
+            for (ItemStack over : target.getInventory().addItem(part).values())
+                target.getWorld().dropItem(target.getLocation(), over);
+        }
+    }
+
     /** /mirage book <игрок> <чар> [уровень] [кол-во] */
     private void book(CommandSender sender, String[] args) {
         if (args.length < 3) { plugin.messages().send(sender, "usage-book"); return; }
@@ -82,6 +150,7 @@ public final class MirageCommand implements CommandExecutor, TabCompleter {
         if (target == null) { plugin.messages().send(sender, "player-not-found"); return; }
         CustomEnchant ce = plugin.registry().get(args[2]);
         if (ce == null) { plugin.messages().send(sender, "unknown-enchant", "id", args[2]); return; }
+        if (!ce.enabled() || !ce.bookEnabled()) { plugin.messages().send(sender, "enchant-disabled", "name", ce.nameRaw()); return; }
         int level = Math.max(1, Math.min(ce.maxLevel(), args.length > 3 ? parseLevel(args[3], 1) : 1));
         int amount = Math.max(1, Math.min(64, args.length > 4 ? parseLevel(args[4], 1) : 1));
         for (int i = 0; i < amount; i++) {
@@ -103,6 +172,7 @@ public final class MirageCommand implements CommandExecutor, TabCompleter {
         CustomEnchant ce = plugin.registry().get(args[1]);
         if (ce == null) { plugin.messages().send(p, "unknown-enchant", "id", args[1]); return; }
         boolean force = args.length > 3 && args[3].equalsIgnoreCase("force");
+        if (!ce.enabled() && !force) { plugin.messages().send(p, "enchant-disabled", "name", ce.nameRaw()); return; }
         int level = Math.max(1, args.length > 2 ? parseLevel(args[2], 1) : 1);
         if (!force) {
             level = Math.min(level, ce.maxLevel());
@@ -134,7 +204,7 @@ public final class MirageCommand implements CommandExecutor, TabCompleter {
         List<String> out = new ArrayList<>();
         if (!cmd.getName().equalsIgnoreCase("mirage")) return out;
         if (args.length == 1) {
-            for (String s : List.of("help", "about", "editor", "list", "book", "add", "remove", "reload"))
+            for (String s : List.of("help", "about", "editor", "list", "item", "book", "add", "remove", "reload"))
                 if (s.startsWith(args[0].toLowerCase(Locale.ROOT))) out.add(s);
             return out;
         }
@@ -143,6 +213,19 @@ public final class MirageCommand implements CommandExecutor, TabCompleter {
             if (args.length == 2) Bukkit.getOnlinePlayers().forEach(p -> { if (p.getName().toLowerCase(Locale.ROOT).startsWith(args[1].toLowerCase(Locale.ROOT))) out.add(p.getName()); });
             else if (args.length == 3) enchIds(args[2], out);
             else if (args.length == 4) levels(args[2], out);
+        } else if (sub.equals("item")) {
+            if (args.length == 2) {
+                for (String s : List.of("save", "give", "get", "list", "delete"))
+                    if (s.startsWith(args[1].toLowerCase(Locale.ROOT))) out.add(s);
+            } else {
+                String a = args[1].toLowerCase(Locale.ROOT);
+                if (a.equals("give") && args.length == 3) {
+                    Bukkit.getOnlinePlayers().forEach(p -> { if (p.getName().toLowerCase(Locale.ROOT).startsWith(args[2].toLowerCase(Locale.ROOT))) out.add(p.getName()); });
+                } else if ((a.equals("give") && args.length == 4) || ((a.equals("get") || a.equals("delete") || a.equals("save")) && args.length == 3)) {
+                    String pre = args[args.length - 1].toLowerCase(Locale.ROOT);
+                    for (String n : plugin.savedItems().names()) if (n.startsWith(pre)) out.add(n);
+                }
+            }
         } else if (sub.equals("add") || sub.equals("remove")) {
             if (args.length == 2) enchIds(args[1], out);
             else if (args.length == 3 && sub.equals("add")) levels(args[1], out);

@@ -9,6 +9,7 @@ import org.github.sawervatoryy.mirageEnchants.economy.EconomyHook;
 import org.github.sawervatoryy.mirageEnchants.enchant.DurabilityRules;
 import org.github.sawervatoryy.mirageEnchants.enchant.EnchantItems;
 import org.github.sawervatoryy.mirageEnchants.enchant.EnchantRegistry;
+import org.github.sawervatoryy.mirageEnchants.items.SavedItems;
 import org.github.sawervatoryy.mirageEnchants.listener.AnvilListener;
 import org.github.sawervatoryy.mirageEnchants.listener.BlockListener;
 import org.github.sawervatoryy.mirageEnchants.listener.CombatListener;
@@ -34,6 +35,7 @@ public final class MirageEnchants extends JavaPlugin {
     private DurabilityRules rules;
     private EconomyHook economy;
     private FilterStore filters;
+    private SavedItems savedItems;
 
     @Override
     public void onEnable() {
@@ -48,6 +50,7 @@ public final class MirageEnchants extends JavaPlugin {
         items = new EnchantItems(this, registry);
         economy = new EconomyHook(this);
         filters = new FilterStore(this);
+        savedItems = new SavedItems(this);
         reloadAll();
 
         var pm = getServer().getPluginManager();
@@ -81,6 +84,7 @@ public final class MirageEnchants extends JavaPlugin {
         messages.reload();
         registry.load(ench);
         economy.setup();
+        savedItems.load();
     }
 
     public static MirageEnchants get() { return instance; }
@@ -90,4 +94,5 @@ public final class MirageEnchants extends JavaPlugin {
     public DurabilityRules rules() { return rules; }
     public EconomyHook economy() { return economy; }
     public FilterStore filters() { return filters; }
+    public SavedItems savedItems() { return savedItems; }
 }
